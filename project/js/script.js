@@ -1,18 +1,102 @@
-// ==================== 데이터 저장소 ====================
+// ==================== 로그인 관리 ====================
+const DEFAULT_PASSWORD = '1234';
+
+// 페이지 로드 시 로그인 상태 확인
+window.addEventListener('DOMContentLoaded', () => {
+    checkLoginStatus();
+    
+    // 로그인된 상태면 메인 앱 초기화
+    if (isLoggedIn()) {
+        initializeApp();
+    }
+});
+
+function isLoggedIn() {
+    return sessionStorage.getItem('shortformLoggedIn') === 'true';
+}
+
+function checkLoginStatus() {
+    const loginScreen = document.getElementById('loginScreen');
+    const mainApp = document.getElementById('mainApp');
+    
+    if (isLoggedIn()) {
+        loginScreen.classList.add('hidden');
+        mainApp.classList.remove('hidden');
+    } else {
+        loginScreen.classList.remove('hidden');
+        mainApp.classList.add('hidden');
+    }
+}
+
+function handleLogin(event) {
+    event.preventDefault();
+    
+    const password = document.getElementById('password').value;
+    const savedPassword = localStorage.getItem('shortformPassword') || DEFAULT_PASSWORD;
+    const loginError = document.getElementById('loginError');
+    
+    if (password === savedPassword) {
+        sessionStorage.setItem('shortformLoggedIn', 'true');
+        loginError.classList.add('hidden');
+        checkLoginStatus();
+        initializeApp();
+        document.getElementById('password').value = '';
+    } else {
+        loginError.classList.remove('hidden');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+    }
+}
+
+function handleLogout() {
+    if (confirm('정말로 로그아웃하시겠습니까?')) {
+        sessionStorage.removeItem('shortformLoggedIn');
+        checkLoginStatus();
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+    }
+}
+
+function changePassword() {
+    const newPassword = document.getElementById('newPassword').value.trim();
+    const confirmPassword = document.getElementById('confirmPassword').value.trim();
+    
+    if (!newPassword) {
+        alert('새 비밀번호를 입력해주세요.');
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        alert('비밀번호가 일치하지 않습니다.');
+        document.getElementById('confirmPassword').focus();
+        return;
+    }
+    
+    if (newPassword.length < 4) {
+        alert('비밀번호는 4자 이상이어야 합니다.');
+        return;
+    }
+    
+    localStorage.setItem('shortformPassword', newPassword);
+    alert('비밀번호가 변경되었습니다!');
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
+}
+
+// ==================== 메인 앱 초기화 ====================
 let videos = [];
 
-// 페이지 로드 시 저장된 영상 불러오기
-window.addEventListener('DOMContentLoaded', () => {
+function initializeApp() {
     loadVideosFromStorage();
     renderVideos(videos);
-    
-    // 드래그 앤 드롭 설정
+    updateStats();
     setupDragAndDrop();
-});
+}
 
 // ==================== 드래그 앤 드롭 ====================
 function setupDragAndDrop() {
     const dropZone = document.getElementById('dropZone');
+    if (!dropZone) return;
     
     dropZone.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -118,6 +202,7 @@ function uploadVideo() {
         videos.unshift(newVideo);
         saveVideosToStorage();
         renderVideos(videos);
+        updateStats();
         
         // 폼 초기화
         resetForm();
@@ -201,6 +286,7 @@ function likeVideo(videoId) {
         video.views += 1;
         saveVideosToStorage();
         renderVideos(videos);
+        updateStats();
     }
 }
 
@@ -209,8 +295,24 @@ function deleteVideo(videoId) {
         videos = videos.filter(v => v.id !== videoId);
         saveVideosToStorage();
         renderVideos(videos);
+        updateStats();
         alert('영상이 삭제되었습니다.');
     }
+}
+
+// ==================== 통계 업데이트 ====================
+function updateStats() {
+    const totalVideos = videos.length;
+    const totalViews = videos.reduce((sum, v) => sum + v.views, 0);
+    const totalLikes = videos.reduce((sum, v) => sum + v.likes, 0);
+    
+    const totalVideosEl = document.getElementById('totalVideos');
+    const totalViewsEl = document.getElementById('totalViews');
+    const totalLikesEl = document.getElementById('totalLikes');
+    
+    if (totalVideosEl) totalVideosEl.textContent = totalVideos;
+    if (totalViewsEl) totalViewsEl.textContent = totalViews;
+    if (totalLikesEl) totalLikesEl.textContent = totalLikes;
 }
 
 // ==================== 검색 및 필터링 ====================
@@ -241,8 +343,8 @@ function scrollToSection(sectionId) {
 
 // ==================== 저장소 관리 ====================
 function saveVideosToStorage() {
-    // 저용량 저장소를 위해 최대 10개의 최신 영상만 저장
-    const dataToSave = videos.slice(0, 10);
+    // 저용량 저장소를 위해 최대 20개의 최신 영상만 저장
+    const dataToSave = videos.slice(0, 20);
     
     try {
         localStorage.setItem('shortformVideos', JSON.stringify(dataToSave));
@@ -274,6 +376,8 @@ function escapeHtml(text) {
 
 // ==================== 키보드 단축키 ====================
 document.addEventListener('keydown', (e) => {
+    if (!isLoggedIn()) return;
+    
     // Ctrl + U: 업로드 섹션으로 이동
     if ((e.ctrlKey || e.metaKey) && e.key === 'u') {
         e.preventDefault();
