@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>숏폼폭팔 - 숏폼 동영상 플랫폼</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- 헤더 -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🎬 숏폼폭팔</h1>
+                <p class="tagline">당신의 숏폼 콘텐츠를 공유하세요</p>
+            </div>
+            <nav class="nav">
+                <button class="btn-upload" onclick="scrollToSection('upload')">📤 영상 업로드</button>
+                <button class="btn-nav" onclick="scrollToSection('videos')">🎥 영상 보기</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 메인 배너 -->
+    <section class="banner">
+        <div class="banner-content">
+            <h2>당신의 순간을 숏폼으로 담아보세요</h2>
+            <p>몇 초의 재미있는 영상으로 사람들과 소통하세요</p>
+            <button class="btn-primary" onclick="scrollToSection('upload')">지금 시작하기</button>
+        </div>
+    </section>
+
+    <!-- 업로드 섹션 -->
+    <section id="upload" class="upload-section">
+        <div class="container">
+            <h2>🎥 숏폼 영상 업로드</h2>
+            <p class="section-desc">30초 이하의 짧은 영상을 업로드해보세요!</p>
+            
+            <div class="upload-form">
+                <div class="form-group">
+                    <label for="title">제목</label>
+                    <input type="text" id="title" placeholder="영상의 제목을 입력하세요 (예: 재미있는 일상)">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">설명</label>
+                    <textarea id="description" placeholder="영상 설명을 입력하세요" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">카테고리</label>
+                    <select id="category">
+                        <option value="">선택하세요</option>
+                        <option value="comedy">코미디</option>
+                        <option value="music">음악</option>
+                        <option value="dance">춤</option>
+                        <option value="cooking">요리</option>
+                        <option value="beauty">뷰티</option>
+                        <option value="travel">여행</option>
+                        <option value="game">게임</option>
+                        <option value="daily">일상</option>
+                        <option value="other">기타</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="video">영상 파일</label>
+                    <div class="video-upload-area" id="dropZone">
+                        <input type="file" id="video" accept="video/*" onchange="handleVideoSelect(event)">
+                        <p>📁 여기에 영상을 드래그하거나 클릭해서 선택하세요</p>
+                        <small>지원: MP4, WebM (최대 30초, 50MB)</small>
+                    </div>
+                    <div id="videoPreview"></div>
+                </div>
+
+                <button class="btn-upload-submit" onclick="uploadVideo()">업로드하기</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- 영상 목록 섹션 -->
+    <section id="videos" class="videos-section">
+        <div class="container">
+            <h2>🎬 업로드된 영상들</h2>
+            
+            <div class="filter-area">
+                <input type="text" id="searchInput" placeholder="영상 검색하기..." onkeyup="filterVideos()">
+                <select id="categoryFilter" onchange="filterVideos()">
+                    <option value="">모든 카테고리</option>
+                    <option value="comedy">코미디</option>
+                    <option value="music">음악</option>
+                    <option value="dance">춤</option>
+                    <option value="cooking">요리</option>
+                    <option value="beauty">뷰티</option>
+                    <option value="travel">여행</option>
+                    <option value="game">게임</option>
+                    <option value="daily">일상</option>
+                    <option value="other">기타</option>
+                </select>
+            </div>
+
+            <div id="videoList" class="video-grid">
+                <!-- 영상들이 여기에 표시됩니다 -->
+            </div>
+
+            <div id="emptyMessage" class="empty-message">
+                <p>📹 아직 업로드된 영상이 없습니다.</p>
+                <p>첫 번째 숏폼을 만들어보세요!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 숏폼폭팔. 모든 권리 보유.</p>
+            <p>간단하고 재미있게 콘텐츠를 공유하세요!</p>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>
